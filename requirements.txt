@@ -1,0 +1,23 @@
+##### Dev
+black
+flake8
+pytest
+
+##### Core scientific package
+numpy
+pandas
+scipy
+
+##### Machine Learning related packages
+scikit-learn
+mlflow
+
+#### Visualisation
+plotly
+matplotlib
+streamlit
+altair
+
+#### AWS
+boto3
+sagemaker
