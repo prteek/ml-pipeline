@@ -1,3 +1,6 @@
+##### Working Environment
+python-dotenv
+
 ##### Dev
 black
 flake8

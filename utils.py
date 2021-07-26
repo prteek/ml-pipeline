@@ -6,6 +6,10 @@ import io
 import numpy as np
 import json
 import math
+import os
+
+
+region = "eu-west-1"
 
 
 def write_dict_to_dynamodb(results_dict: dict, table_name: str) -> dict:
@@ -18,7 +22,10 @@ def write_dict_to_dynamodb(results_dict: dict, table_name: str) -> dict:
     """
 
     table = boto3.resource(
-        "dynamodb"
+        "dynamodb",
+        aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
+        aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
+        region_name=region,
     ).Table(table_name)
 
     data = json.loads(json.dumps(dict_to_dynamodb(results_dict)), parse_float=Decimal)
@@ -76,7 +83,10 @@ def get_data_from_dynamodb(
     """Convert a json response from dynamodb query to a dictionary"""
 
     table = boto3.resource(
-        "dynamodb"
+        "dynamodb",
+        aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
+        aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
+        region_name=region,
     ).Table(table_name)
 
     response = table.query(KeyConditionExpression=Key(primary_key_name).eq(key_value))
