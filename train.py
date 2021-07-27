@@ -8,6 +8,7 @@ from sklearn.impute import SimpleImputer
 import argparse
 import joblib
 import os
+from logger import logger
 
 if __name__ == '__main__':
     
@@ -20,6 +21,7 @@ if __name__ == '__main__':
     training_dir = args.training
     model_dir = args.model_dir
 
+    logger.info('Reading training data')
     df = pd.read_parquet(os.path.join(training_dir, "train.parquet"))
     
     predictors = ['x1', 'x2']
@@ -30,12 +32,13 @@ if __name__ == '__main__':
     
     model = KNeighborsClassifier(n_neighbors=5)
     
+    logger.info('Fitting model')
     model.fit(X,y)
 
-    model_dir = "." # Override output data saving by changing default location
     joblib.dump(model, os.path.join(model_dir, "model.mdl"))
 
-    bucket = boto3.resource('s3', region_name='eu-west-1').Bucket('hastie')    
+    logger.info('Uploading model to s3')
+    bucket = boto3.resource('s3', region_name='eu-west-1').Bucket('hastie')
     bucket.upload_file(os.path.join(model_dir, "model.mdl"), Key='model/model.mdl')
     
     

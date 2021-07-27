@@ -1,3 +1,5 @@
+import sys
+sys.path.append('/opt/ml/processing/input/') # To read helper files
 import pandas as pd
 import numpy as np
 import argparse
@@ -6,6 +8,8 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 import joblib
+from logger import logger
+
 
 if __name__ == '__main__':
     
@@ -20,7 +24,7 @@ if __name__ == '__main__':
     parser.add_argument('--input-dir',
                         type=str, 
                         help='Local directory (or in container) from where raw data is read',
-                        default='/opt/ml/processing/input')
+                        default='/opt/ml/processing/input/data')
 
     args, _ = parser.parse_known_args()
     
@@ -30,12 +34,15 @@ if __name__ == '__main__':
     input_dir = args.input_dir
     
     # Read raw data from previous step
+    logger.info("Reading raw data")
     df = pd.read_parquet(os.path.join(input_dir, "raw_data.parquet"))
     
     # Drop nans
+    logger.info("Cleaning DataFrame")
     df.dropna(axis=0, inplace=True)
 
     # Split train and test data
+    logger.info(f"Splitting Train-test data in {train_test_ratio}")
     predictors = ['x1', 'x2']
     target = ['is_blue']
     
@@ -44,6 +51,7 @@ if __name__ == '__main__':
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=(1-train_test_ratio), random_state=42)
     
     # Preprocessing steps
+    logger.info("Preprocessing data")
     scaler = StandardScaler()
     preprocessing_pipeline = Pipeline([('scaler', scaler)])
     
@@ -60,6 +68,7 @@ if __name__ == '__main__':
     df_train = pd.DataFrame(np.c_[X_train, y_train], columns=predictors+target)
     df_test = pd.DataFrame(np.c_[X_test, y_test], columns=predictors+target)
 
+    logger.info("Saving preprocessed data")
     df_train.to_parquet(train_data_filepath)
     df_test.to_parquet(test_data_filepath)
     

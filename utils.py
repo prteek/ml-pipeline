@@ -7,7 +7,8 @@ import numpy as np
 import json
 import math
 import os
-
+import tarfile
+from functools import reduce
 
 region = "eu-west-1"
 
@@ -70,6 +71,8 @@ def dynamodb_to_dict(item):
             return float(item)
         else:
             return int(item)
+    elif isinstance(item, str) and (item == 'nan'):
+        return math.nan
     else:
         return item
 
@@ -93,3 +96,21 @@ def get_data_from_dynamodb(
     results_dict = dynamodb_to_dict(response["Items"])
 
     return results_dict
+
+
+def make_simple_pipe(list_of_functions):
+    pipe = lambda data: reduce(lambda r, f: f(r), list_of_functions, data)
+    return pipe
+
+
+def create_tar_from_files(file_list, tar_name):
+    with tarfile.open(tar_name, "w:gz") as tar_handle:
+        for file in file_list:
+            tar_handle.add(file)
+    return None
+
+            
+unpack_nested_list = lambda nested_list: reduce(lambda r,x: r+x, nested_list)
+
+            
+            
