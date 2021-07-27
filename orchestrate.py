@@ -159,7 +159,7 @@ step_register = RegisterModel(
     model_data=training_step.properties.ModelArtifacts.S3ModelArtifacts,
     content_types=["text/csv"],
     response_types=["text/csv"],
-    inference_instances=["ml.t3.medium"],
+    inference_instances=["ml.t2.medium", "ml.m5.large"],
     transform_instances=["ml.m5.large"],
     model_metrics=model_metrics,
 )
