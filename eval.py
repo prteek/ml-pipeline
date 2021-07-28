@@ -44,12 +44,15 @@ if __name__ == '__main__':
     
     y_pred = model.predict(X)
     
+    logger.info('Calculating report metrics')
     report = dict()
     report['score'] = dict()
     report['score']['accuracy'] = dict()
     report['score']['accuracy']['value'] = accuracy_score(y, y_pred)
     report['score']['test_size'] = len(y)
     
+    
+    logger.info('Writing report')
     report_path = f"{report_dir}/evaluation.json"
     with open(report_path, "w") as f:
         f.write(json.dumps(report))
