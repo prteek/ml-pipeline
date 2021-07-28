@@ -6,6 +6,7 @@ import numpy as np
 import argparse
 import os
 from sklearn.preprocessing import StandardScaler
+from sklearn.impute import SimpleImputer
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 import joblib
@@ -45,9 +46,9 @@ if __name__ == "__main__":
     logger.info("Reading raw data")
     df = pd.read_parquet(os.path.join(input_dir, "raw_data.parquet"))
 
-    # Drop nans
-    logger.info("Cleaning DataFrame")
-    df.dropna(axis=0, inplace=True)
+#     # Drop nans
+#     logger.info("Cleaning DataFrame")
+#     df.dropna(axis=0, inplace=True)
 
     # Split train and test data
     logger.info(f"Splitting Train-test data in {train_test_ratio}")
@@ -63,7 +64,8 @@ if __name__ == "__main__":
     # Preprocessing steps
     logger.info("Preprocessing data")
     scaler = StandardScaler()
-    preprocessing_pipeline = Pipeline([("scaler", scaler)])
+    imputer = SimpleImputer()
+    preprocessing_pipeline = Pipeline([("scaler", scaler), ('imputer', imputer)])
 
     X_train = preprocessing_pipeline.fit_transform(X_train)
     X_test = preprocessing_pipeline.transform(X_test)
