@@ -3,7 +3,7 @@
 This repo exists to orchestrate end-to-end ml-training workflow in AWS sagemaker that would allow continuous model retraining periodically and maintain traceability and model quality using orchestration best practices.  
 
 
-<img src="./metadata/images/pipeline_graph.PNG" width=250 height=250 align="center">
+<img src="./metadata/images/pipeline_graph.PNG" width=190 height=220 align="center">
 
 
 ## Guide
