@@ -47,6 +47,16 @@ def create_processor(image_uri, job_name, local_mode=False):
     return processor
 
 
+
+def create_and_upload_training_code_package(file_list, source_code_package='sourcedir.tar.gz', bucket='hastie'):
+    """Create tarfile package and upload to s3 for use in training"""
+    create_tar_from_files(file_list, source_code_package)
+    source_code_location = session.upload_data(source_code_package, bucket, key_prefix='train')
+    os.system(f"rm {source_code_package}") # delete tarfile after upload
+    return source_code_location
+
+
+
 def orchestrate_training_pipeline(image_uri, bucket='hastie'):
 
     helpers = upload_code_helpers(['utils.py', 'logger.py'], bucket, prefix='helpers')
@@ -91,9 +101,11 @@ def orchestrate_training_pipeline(image_uri, bucket='hastie'):
 
 
     # ------------------- Training step --------------------- #
-    source_code_package = 'sourcedir.tar.gz'
-    create_tar_from_files(['train.py', 'logger.py'], source_code_package)
-    source_code_location = session.upload_data(source_code_package, bucket, key_prefix='train')
+
+    file_list = ['train.py', 'logger.py']
+    source_code_location = create_and_upload_training_code_package(file_list,
+                                                                   source_code_package='sourcedir.tar.gz',
+                                                                   bucket=bucket)
     output_path = 's3://hastie/model/artifacts'
     training_data_location = preprocess_step.properties.ProcessingOutputConfig.Outputs['processed_data'].S3Output.S3Uri
     estimator = SKLearn(role=role,
