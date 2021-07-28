@@ -143,27 +143,25 @@ evaluation_step = ProcessingStep(name='model-evaluation',
 
 
 # -------------------------- Register model ------------------------- #
-
 model_metrics = ModelMetrics(
     model_statistics=MetricsSource(
-        s3_uri="{}/evaluation.json".format(
-            evaluation_step.properties.ProcessingOutputConfig.Outputs['evaluation'].S3Output.S3Uri
-        ),
+        s3_uri="{}/evaluation.json".format(eval_output_location),
         content_type="application/json",
     )
 )
 
+model_data = training_step.properties.ModelArtifacts.S3ModelArtifacts
+
 step_register = RegisterModel(
     name="register-model",
     estimator=estimator,
-    model_data=training_step.properties.ModelArtifacts.S3ModelArtifacts,
+    model_data=model_data,
     content_types=["text/csv"],
     response_types=["text/csv"],
     inference_instances=["ml.t2.medium", "ml.m5.large"],
     transform_instances=["ml.m5.large"],
     model_metrics=model_metrics,
 )
-
 
 # -------------------------- Notify bad model ------------------------- #
 notify_bad_model_processor = create_processor(image_uri, 'notify-bad-model', local_mode=False)
@@ -205,6 +203,6 @@ training_pipeline = Pipeline(name='training-pipeline',
 
 training_pipeline.upsert(role_arn=role)
 
-training_pipeline.start(parameters={'end-date':'2021-07-27', 'number-of-days':4})
+# training_pipeline.start(parameters={'end-date':'2021-07-27', 'number-of-days':4})
 
 
