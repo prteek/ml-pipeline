@@ -2,13 +2,11 @@ from decimal import Decimal
 from boto3.dynamodb.conditions import Key
 import boto3
 from functools import reduce
-import io
 import numpy as np
 import json
 import math
 import os
 import tarfile
-from functools import reduce
 
 region = "eu-west-1"
 
@@ -56,8 +54,7 @@ def dict_to_dynamodb(item: dict) -> dict:
         return bool(item)
     else:
         return item
-    
-    
+
 
 def dynamodb_to_dict(item):
     """Take json response from a dynamodb query and return a dictionary of appropriate data types"""
@@ -71,11 +68,10 @@ def dynamodb_to_dict(item):
             return float(item)
         else:
             return int(item)
-    elif isinstance(item, str) and (item == 'nan'):
+    elif isinstance(item, str) and (item == "nan"):
         return math.nan
     else:
         return item
-
 
 
 def get_data_from_dynamodb(
@@ -109,8 +105,5 @@ def create_tar_from_files(file_list, tar_name):
             tar_handle.add(file)
     return None
 
-            
-unpack_nested_list = lambda nested_list: reduce(lambda r,x: r+x, nested_list)
 
-            
-            
+unpack_nested_list = lambda nested_list: reduce(lambda r, x: r + x, nested_list)

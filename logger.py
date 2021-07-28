@@ -15,7 +15,9 @@ stream_handler.setLevel(logging.DEBUG)
 # file_handler.setLevel(logging.INFO)
 
 # the formatter determines what our logs will look like
-stream_formatter = logging.Formatter("[%(asctime)s] %(levelname)s %(funcName)s : %(message)s")
+stream_formatter = logging.Formatter(
+    "[%(asctime)s] %(levelname)s %(funcName)s : %(message)s"
+)
 # file_formatter = logging.Formatter("%(levelname)s %(asctime)s %(message)s")
 
 # here we hook everything together
