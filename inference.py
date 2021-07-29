@@ -22,7 +22,7 @@ def inference_handler(event, context=None):
     bucket.download_file(Key=preprocessor_key, Filename=os.path.join(artefacts_directory, preprocessor_filename))    
     preprocessor = joblib.load(os.path.join(artefacts_directory, preprocessor_filename))
     
-    payload = event['params']['header']
+    payload = event['body']
     print(payload)
     
     data = json.loads(payload['data'])
