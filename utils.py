@@ -7,6 +7,8 @@ import json
 import math
 import os
 import tarfile
+from dotenv import load_dotenv
+load_dotenv("./local_credentials.env") 
 
 region = "eu-west-1"
 
@@ -48,10 +50,12 @@ def dict_to_dynamodb(item: dict) -> dict:
         or isinstance(item, np.int64)
         or isinstance(item, np.int8)
         or isinstance(item, np.uint8)
+        or isinstance(item, float)
     ):
-        return float(item)
+        return round(Decimal(item),3)
     elif isinstance(item, np.bool_):
         return bool(item)
+    
     else:
         return item
 
