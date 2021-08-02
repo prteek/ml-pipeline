@@ -18,4 +18,4 @@ if __name__ == "__main__":
     args, _ = parser.parse_known_args()
     message = args.message
 
-    logger.info("message")
+    logger.info(message)
