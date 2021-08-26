@@ -16,9 +16,16 @@ from sagemaker.workflow.condition_step import (
 )
 import argparse
 from utils import create_tar_from_files
+from dotenv import load_dotenv
+load_dotenv("./local_credentials.env")
+
 
 session = sagemaker.Session()
-role = sagemaker.get_execution_role()
+try:
+    role = sm.get_execution_role()
+except ValueError:
+    role = os.environ['SAGEMAKER_EXECUTION_ROLE']
+
 
 
 def upload_code_helpers(filepath_list: list, bucket: str, prefix: str) -> str:
