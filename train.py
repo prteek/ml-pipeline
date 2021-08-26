@@ -6,6 +6,13 @@ import joblib
 import os
 from logger import logger
 
+
+def model_fn(model_dir):
+    """Required model loading for Sagemaker framework"""
+    model = joblib.load(os.path.join(model_dir, "model.mdl"))
+    return model
+
+    
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
@@ -44,6 +51,3 @@ if __name__ == "__main__":
     bucket = boto3.resource("s3", region_name="eu-west-1").Bucket("hastie")
     bucket.upload_file(os.path.join(model_dir, "model.mdl"), Key="model/model.mdl")
 
-
-def model_fn(model_dir):
-    model = joblib.load(os.path.join(model_dir, "model.mdl"))
