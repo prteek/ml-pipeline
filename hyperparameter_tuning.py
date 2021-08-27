@@ -2,27 +2,15 @@ import os
 import sagemaker
 import argparse
 from sagemaker.sklearn import SKLearn
-from sagemaker.tuner import HyperparameterTuner
-from sagemaker.tuner import IntegerParameter
-from utils import create_tar_from_files
+from sagemaker.tuner import HyperparameterTuner, IntegerParameter
+from sagemaker.analytics import HyperparameterTuningJobAnalytics
+from orchestrate import create_and_upload_training_code_package
 from dotenv import load_dotenv
 load_dotenv("./local_credentials.env")
 
 
 session = sagemaker.Session()
 role = os.environ['SAGEMAKER_EXECUTION_ROLE']
-
-
-def create_and_upload_training_code_package(
-    file_list, source_code_package="sourcedir.tar.gz", bucket="hastie"
-):
-    """Create tarfile package and upload to s3 for use in training"""
-    create_tar_from_files(file_list, source_code_package)
-    source_code_location = session.upload_data(
-        source_code_package, bucket, key_prefix="train"
-    )
-    os.system(f"rm {source_code_package}")  # delete tarfile after upload
-    return source_code_location
 
 
 if __name__ == '__main__':
@@ -37,6 +25,7 @@ if __name__ == '__main__':
 
 
     estimator = SKLearn(
+            base_job_name='hastie-classification',
             role=role,
             entry_point="train.py",
             framework_version="0.23-1",
@@ -65,9 +54,15 @@ if __name__ == '__main__':
                                 hyperparams,
                                 metric_definitions=metric_definitions,
                                 objective_type='Maximize',
+                                base_tuning_job_name='hastie-knn-tuning',
                                 max_jobs=8,
                                 max_parallel_jobs=4,
                                 early_stopping_type='Auto')
 
     tuner.fit(inputs={'training':training_data_location}) # Same channel name as expected in train.py
 
+
+    # Analysing the runs (alternately look in Sagemaker studio experiments and trials)
+    exp = HyperparameterTuningJobAnalytics(hyperparameter_tuning_job_name=tuner.latest_tuning_job.name)
+    od_jobs = exp.dataframe()
+    od_jobs.sort_values('FinalObjectiveValue', ascending=0)
