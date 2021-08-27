@@ -21,12 +21,7 @@ load_dotenv("./local_credentials.env")
 
 
 session = sagemaker.Session()
-try:
-    role = sm.get_execution_role()
-except ValueError:
-    role = os.environ['SAGEMAKER_EXECUTION_ROLE']
-
-
+role = os.environ['SAGEMAKER_EXECUTION_ROLE']
 
 def upload_code_helpers(filepath_list: list, bucket: str, prefix: str) -> str:
     for filepath in filepath_list:
