@@ -5,6 +5,8 @@ import argparse
 import joblib
 import os
 from logger import logger
+from sklearn.metrics import f1_score
+import json
 
 
 def model_fn(model_dir):
@@ -25,11 +27,18 @@ if __name__ == "__main__":
     parser.add_argument(
         "--training", type=str, default=os.environ["SM_CHANNEL_TRAINING"]
     )
-
+    
     args, _ = parser.parse_known_args()
 
     training_dir = args.training
     model_dir = args.model_dir
+    
+    # Needed for hyperparameter tuning (can be used for both custom and sagemaker algorithms)
+    with open('/opt/ml/input/config/hyperparameters.json', 'r') as tc:
+        hyperparams = json.load(tc) # All hyperparameters parsed as string
+        
+    # Allocate hyperparameters
+    n_neighbors = int(hyperparams['n_neighbors'])  # integer
 
     logger.info("Reading training data")
     df = pd.read_parquet(os.path.join(training_dir, "train.parquet"))
@@ -40,10 +49,14 @@ if __name__ == "__main__":
     X = df[predictors]
     y = df[target].values.ravel()
 
-    model = KNeighborsClassifier(n_neighbors=5)
+    model = KNeighborsClassifier(n_neighbors=n_neighbors)
 
     logger.info("Fitting model")
     model.fit(X, y)
+
+    # Emit the required custom metrics (for hyperparameter tuning).
+    f1 = f1_score(y, model.predict(X))
+    print(f"f1_score = {f1};") # Mind the spaces to match Regex definition in Tuner
 
     joblib.dump(model, os.path.join(model_dir, "model.mdl"))
 
