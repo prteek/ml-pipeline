@@ -150,6 +150,9 @@ def orchestrate_training_pipeline(image_uri, bucket="hastie"):
         instance_type="ml.m5.large",
         source_dir=source_code_location,
         output_path=output_path,
+        use_spot_instances=False,
+        max_wait=1800,
+        max_run=300,
         hyperparameters={'n_neighbors':5}
     )
 
