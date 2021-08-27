@@ -150,6 +150,7 @@ def orchestrate_training_pipeline(image_uri, bucket="hastie"):
         instance_type="ml.m5.large",
         source_dir=source_code_location,
         output_path=output_path,
+        hyperparameters={'n_neighbors':5}
     )
 
     training_step = TrainingStep(
