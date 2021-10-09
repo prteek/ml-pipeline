@@ -153,7 +153,7 @@ def orchestrate_training_pipeline(image_uri, bucket="hastie"):
         use_spot_instances=True,
         max_wait=1800,
         max_run=300,
-        hyperparameters={'n_neighbors':5}
+        hyperparameters={'C':1}
     )
 
     training_step = TrainingStep(

@@ -1,6 +1,7 @@
 import pandas as pd
 import boto3
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.svm import SVC
 import argparse
 import joblib
 import os
@@ -38,7 +39,7 @@ if __name__ == "__main__":
         hyperparams = json.load(tc) # All hyperparameters parsed as string
         
     # Allocate hyperparameters
-    n_neighbors = int(hyperparams['n_neighbors'])  # integer
+    C = float(hyperparams['C'])  # float
 
     logger.info("Reading training data")
     df = pd.read_parquet(os.path.join(training_dir, "train.parquet"))
@@ -49,8 +50,8 @@ if __name__ == "__main__":
     X = df[predictors]
     y = df[target].values.ravel()
 
-    model = KNeighborsClassifier(n_neighbors=n_neighbors)
-
+    model = SVC(C=C, kernel='rbf', class_weight='balanced')
+    
     logger.info("Fitting model")
     model.fit(X, y)
 
